@@ -15,50 +15,57 @@
   </li>
 */
 
-import iziToast from "izitoast";
-import "izitoast/dist/css/iziToast.min.css";
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
 
-import { checkValidate } from "./js/refs";
-
-const _OK = "OK";
-const _NO = "NO";
-
-const type_STRING = "string";
-const type_Num = "num";
-
-const state_OK = "Success";
-const state_ERROR = "Error";
-
-const col_red = "#ef4040";
-const col_green = "#008000";
-
+import { checkValidate, showNotification } from "./js/refs";
+import * as CONST from "./js/constants";
 
 const eventList = document.querySelector("ul.tasks-list");
 
 const formInput = document.querySelector(".header-form");
-//const btnAdd = document.querySelector("header-form-btn");
+
 const inputTitle = document.querySelector("input[name='taskName']");
 const inputTask = document.querySelector("input[name='taskDescription']");
+const inputDate = document.querySelector("input[name='dateTime']");
 
+let userSelectedDate;
 
+const options = {
+  time_24hr: true,
+  defaultDate: new Date(),
+  minuteIncrement: 1,
+  onClose(selectedDates) {
+    userSelectedDate = selectedDates[0];
+    //console.log(userSelectedDate);
+
+    checkValidate(userSelectedDate, CONST.type_DATE, "Date")
+  },
+};
+
+flatpickr(inputDate, options);
 
 function addEvent() {
-  let objVal = {};
-
   const titleValue = inputTitle.value.trim();
   const titleDesc = inputTask.value.trim();
 
-  objVal = checkValidate(titleValue, type_STRING, "Title");
-
-  if (objVal.state !== _OK) {
-    showNotification(state_ERROR, objVal.message);
+  try {
+    const selectedDate = new Date(inputDate.value.trim());
+  }
+  catch {
+    showNotification(CONST.state_ERROR, "Can not read entered date");
     return;
   }
 
-  objVal = checkValidate(titleDesc, type_STRING, "Description");
+  if (!checkValidate(userSelectedDate, CONST.type_DATE, "Date")) {
+    return;
+  }
 
-  if (objVal.state !== _OK) {
-    showNotification(state_ERROR, objVal.message);
+  if (!checkValidate(titleValue, CONST.type_STRING, "Title")) {
+    return;
+  }
+
+  if (!checkValidate(titleDesc, CONST.type_STRING, "Description")) {
     return;
   }
 
@@ -67,28 +74,17 @@ function addEvent() {
   <button class="task-list-item-btn">Delete</button>
   <h3>${titleValue.trim()}</h3>
   <p>${titleDesc.trim()}</p>
+  <p>${userSelectedDate.toLocaleString("uk-UA", CONST.format_DATA)}</p>
   </li>`;
 
-  console.log(newEl);
+  //console.log(newEl);
 
   eventList.insertAdjacentHTML("beforeend", newEl);
 
-  inputTitle.value = "";
-  inputTask.value = "";
+  formInput.reset();
 
-  showNotification(state_OK, "Event added", col_green);
+  showNotification(CONST.state_OK, "Event added", CONST.col_green);
 
-}
-
-function showNotification(state, message, type = col_red) {
-  iziToast.show({
-    id: String(state).toLocaleLowerCase(),
-    title: state,
-    message: message,
-    messageColor: 'white',
-    color: type,
-    position: 'bottomCenter',
-  });
 }
 
 
