@@ -14,6 +14,7 @@
       <p>Текст</p>
   </li>
 */
+
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
@@ -47,14 +48,14 @@ function addEvent() {
   const titleValue = inputTitle.value.trim();
   const titleDesc = inputTask.value.trim();
 
-  objVal = checkValidate(titleValue, type_STRING);
+  objVal = checkValidate(titleValue, type_STRING, "Title");
 
   if (objVal.state !== _OK) {
     showNotification(state_ERROR, objVal.message);
     return;
   }
 
-  objVal = checkValidate(titleDesc, type_STRING);
+  objVal = checkValidate(titleDesc, type_STRING, "Description");
 
   if (objVal.state !== _OK) {
     showNotification(state_ERROR, objVal.message);
